@@ -48,6 +48,11 @@ function openNotePrompt(choreName) {
   }, 10);
 }
 
+function closeNoteModal() {
+  document.getElementById("note-modal").classList.add("hidden");
+  pendingChore = null;
+}
+
 async function submitNote() {
   const note = document.getElementById("note-input").value;
   const now = new Date();
@@ -106,7 +111,6 @@ function exitToHome() {
   document.getElementById("history-list").innerHTML = "";
 }
 
-// Global handlers for HTML buttons
 function selectUser(userId) {
   selectedUser = userId;
   document.getElementById("user-select").classList.add("hidden");
@@ -136,11 +140,7 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
-function closeNoteModal() {
-    document.getElementById("note-modal").classList.add("hidden");
-  }
-
-// Submit PIN with Enter key
+// Allow submitting PIN with Enter key
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -148,12 +148,10 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// temporary debug step to suppress modal window
-document.getElementById("note-modal").classList.add("hidden");
-
-// Make functions accessible to HTML
+// Expose functions globally
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
 window.submitNote = submitNote;
+window.closeNoteModal = closeNoteModal;

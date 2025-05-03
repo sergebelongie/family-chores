@@ -17,6 +17,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 1000;
     }
 
     #note-box {
@@ -37,6 +38,7 @@
 
     #note-box button {
       margin-top: 1em;
+      margin-right: 0.5em;
     }
   </style>
 </head>
@@ -71,15 +73,17 @@
     </div>
   </div>
 
+  <!-- Note Modal -->
   <div id="note-modal" class="hidden">
     <div id="note-box">
       <p id="note-prompt-text"></p>
       <input type="text" id="note-input" placeholder="Optional note..." />
+      <br />
       <button onclick="submitNote()">Log chore</button>
       <button onclick="closeNoteModal()">Cancel</button>
     </div>
   </div>
-  
+
   <script type="module" src="script.js"></script>
 </body>
 </html>
