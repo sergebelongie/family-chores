@@ -11,6 +11,7 @@ import {
 import { firebaseConfig } from './firebase-config.js';
 import { allChores } from './chores.js';
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -90,14 +91,14 @@ function exitToHome() {
 }
 
 // Global handlers for HTML buttons
-window.selectUser = async function(userId) {
+function selectUser(userId) {
   selectedUser = userId;
   document.getElementById("user-select").classList.add("hidden");
   document.getElementById("pin-entry").classList.remove("hidden");
   document.getElementById("pin-input").focus();
-};
+}
 
-window.submitPIN = async function() {
+async function submitPIN() {
   const inputPIN = document.getElementById("pin-input").value;
   const userRef = doc(db, "users", selectedUser);
   const userSnap = await getDoc(userRef);
@@ -117,7 +118,7 @@ window.submitPIN = async function() {
   document.getElementById("chore-logger").classList.remove("hidden");
   document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
   renderChoreButtons();
-};
+}
 
 // Enable pressing Enter to submit PIN
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
@@ -126,3 +127,9 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
     submitPIN();
   }
 });
+
+// Expose functions for use in HTML
+window.selectUser = selectUser;
+window.submitPIN = submitPIN;
+window.showChoreHistory = showChoreHistory;
+window.exitToHome = exitToHome;
