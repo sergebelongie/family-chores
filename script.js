@@ -1,4 +1,3 @@
-// Import Firebase modules from CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore,
@@ -10,20 +9,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { firebaseConfig } from './firebase-config.js';
+import { allChores } from './chores.js';
 
-// Initialize Firebase app and Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// Define the list of chores (can be expanded)
-const allChores = [
-  "Brush teeth",
-  "Make bed",
-  "Feed guinea pigs",
-  "Put away toys",
-  "Read independently",
-  "Pack school bag"
-];
 
 let selectedUser = null;
 
@@ -40,10 +29,7 @@ async function logChore(choreName) {
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
   const logRef = doc(db, "logs", `${selectedUser}_${week}`);
 
-  await setDoc(logRef, {
-    user: selectedUser,
-    week,
-  }, { merge: true });
+  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
 
   await updateDoc(logRef, {
     entries: arrayUnion({
@@ -70,11 +56,45 @@ function renderChoreButtons() {
   });
 }
 
-// Make these functions available to the HTML buttons
+async function showChoreHistory() {
+  const now = new Date();
+  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
+  const logSnap = await getDoc(logRef);
+  const historyEl = document.getElementById("chore-history");
+  const listEl = document.getElementById("history-list");
+
+  if (!logSnap.exists()) {
+    listEl.innerHTML = "<li>No chores logged yet.</li>";
+  } else {
+    const data = logSnap.data();
+    const entries = data.entries || [];
+    listEl.innerHTML = entries.map(entry => {
+      const date = new Date(entry.timestamp).toLocaleString();
+      return `<li>${entry.chore} – <small>${date}</small></li>`;
+    }).join("");
+  }
+
+  historyEl.classList.remove("hidden");
+}
+
+function exitToHome() {
+  selectedUser = null;
+  document.getElementById("pin-input").value = "";
+  document.getElementById("pin-status").textContent = "";
+  document.getElementById("user-select").classList.remove("hidden");
+  document.getElementById("pin-entry").classList.add("hidden");
+  document.getElementById("chore-logger").classList.add("hidden");
+  document.getElementById("chore-history").classList.add("hidden");
+  document.getElementById("history-list").innerHTML = "";
+}
+
+// Global handlers for HTML buttons
 window.selectUser = async function(userId) {
   selectedUser = userId;
   document.getElementById("user-select").classList.add("hidden");
   document.getElementById("pin-entry").classList.remove("hidden");
+  document.getElementById("pin-input").focus();
 };
 
 window.submitPIN = async function() {
@@ -96,6 +116,13 @@ window.submitPIN = async function() {
   document.getElementById("pin-entry").classList.add("hidden");
   document.getElementById("chore-logger").classList.remove("hidden");
   document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
-
   renderChoreButtons();
 };
+
+// Enable pressing Enter to submit PIN
+document.getElementById("pin-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    submitPIN();
+  }
+});

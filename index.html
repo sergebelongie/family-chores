@@ -32,6 +32,14 @@
     <p>Tap a chore to log it for today:</p>
     <div id="chore-buttons"></div>
     <p id="log-status" style="color:green;"></p>
+
+    <button onclick="showChoreHistory()">View logged chores</button>
+    <button onclick="exitToHome()">Exit</button>
+
+    <div id="chore-history" class="hidden">
+      <h3>This Week's Chore Log</h3>
+      <ul id="history-list"></ul>
+    </div>
   </div>
 
   <script type="module" src="script.js"></script>
