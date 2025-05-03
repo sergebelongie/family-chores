@@ -26,24 +26,26 @@ function getWeekNumber(date) {
 }
 
 async function logChore(choreName) {
-  const now = new Date();
-  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
-
-  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
-
-  await updateDoc(logRef, {
-    entries: arrayUnion({
-      chore: choreName,
-      timestamp: now.toISOString()
-    })
-  });
-
-  document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
-  setTimeout(() => {
-    document.getElementById("log-status").textContent = "";
-  }, 1500);
-}
+    const note = prompt(`Optional note for: ${choreName}`, "");
+    const now = new Date();
+    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+    const logRef = doc(db, "logs", `${selectedUser}_${week}`);
+  
+    await setDoc(logRef, { user: selectedUser, week }, { merge: true });
+  
+    await updateDoc(logRef, {
+      entries: arrayUnion({
+        chore: choreName,
+        timestamp: now.toISOString(),
+        note: note || ""  // Store as empty string if user skips
+      })
+    });
+  
+    document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
+    setTimeout(() => {
+      document.getElementById("log-status").textContent = "";
+    }, 1500);
+  }
 
 function renderChoreButtons() {
   const container = document.getElementById("chore-buttons");
@@ -72,7 +74,7 @@ async function showChoreHistory() {
     const entries = data.entries || [];
     listEl.innerHTML = entries.map(entry => {
       const date = new Date(entry.timestamp).toLocaleString();
-      return `<li>${entry.chore} – <small>${date}</small></li>`;
+      return `<li>${entry.chore} – <small>${date}</small>${entry.note ? `<br><em>${entry.note}</em>` : ""}</li>`;
     }).join("");
   }
 
