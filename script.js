@@ -144,6 +144,9 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
+// temporary debug step to suppress modal window
+document.getElementById("note-modal").classList.add("hidden");
+
 // Make functions accessible to HTML
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
