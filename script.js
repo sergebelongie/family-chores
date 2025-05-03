@@ -26,26 +26,26 @@ function getWeekNumber(date) {
 }
 
 async function logChore(choreName) {
-    const note = prompt(`Optional note for: ${choreName}`, "");
-    const now = new Date();
-    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-    const logRef = doc(db, "logs", `${selectedUser}_${week}`);
-  
-    await setDoc(logRef, { user: selectedUser, week }, { merge: true });
-  
-    await updateDoc(logRef, {
-      entries: arrayUnion({
-        chore: choreName,
-        timestamp: now.toISOString(),
-        note: note || ""  // Store as empty string if user skips
-      })
-    });
-  
-    document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
-    setTimeout(() => {
-      document.getElementById("log-status").textContent = "";
-    }, 1500);
-  }
+  const note = prompt(`Optional note for: ${choreName}`, "");
+  const now = new Date();
+  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
+
+  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
+
+  await updateDoc(logRef, {
+    entries: arrayUnion({
+      chore: choreName,
+      timestamp: now.toISOString(),
+      note: note || ""
+    })
+  });
+
+  document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
+  setTimeout(() => {
+    document.getElementById("log-status").textContent = "";
+  }, 1500);
+}
 
 function renderChoreButtons() {
   const container = document.getElementById("chore-buttons");
@@ -130,7 +130,7 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose functions for use in HTML
+// Expose functions for HTML buttons
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
