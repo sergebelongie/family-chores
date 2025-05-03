@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Family Chores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    button { font-size: 1.2em; margin: 0.5em; padding: 0.6em 1.2em; }
+    .hidden { display: none; }
+    .chore-button { display: block; margin: 0.5em auto; }
+  </style>
+</head>
+<body>
+  <h1>🧹 Family Chores</h1>
+
+  <div id="user-select">
+    <p>Select your name:</p>
+    <button onclick="selectUser('august')">August</button>
+    <button onclick="selectUser('emilia')">Emilia</button>
+  </div>
+
+  <div id="pin-entry" class="hidden">
+    <p>Enter your PIN:</p>
+    <input type="password" id="pin-input" />
+    <button onclick="submitPIN()">Submit</button>
+    <p id="pin-status" style="color:red;"></p>
+  </div>
+
+  <div id="chore-logger" class="hidden">
+    <h2 id="user-title"></h2>
+    <p>Tap a chore to log it for today:</p>
+    <div id="chore-buttons"></div>
+    <p id="log-status" style="color:green;"></p>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
