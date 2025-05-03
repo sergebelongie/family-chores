@@ -16,6 +16,7 @@ const db = getFirestore(app);
 
 let selectedUser = null;
 
+// Get ISO-style week label
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const dayNum = d.getUTCDay() || 7;
@@ -24,6 +25,7 @@ function getWeekNumber(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
+// Log predefined chore
 async function logChore(choreName) {
   const note = prompt(`Optional note for: ${choreName}`, "");
   const now = new Date();
@@ -40,61 +42,64 @@ async function logChore(choreName) {
     })
   });
 
-  async function logOtherChore() {
-    let note = "";
-    while (!note) {
-      note = prompt("Describe the chore you completed:");
-      if (note === null) return; // user hit cancel
-      note = note.trim();
-    }
-  
-    const now = new Date();
-    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-    const logRef = doc(db, "logs", `${selectedUser}_${week}`);
-  
-    await setDoc(logRef, { user: selectedUser, week }, { merge: true });
-  
-    await updateDoc(logRef, {
-      entries: arrayUnion({
-        chore: "Other",
-        timestamp: now.toISOString(),
-        note
-      })
-    });
-  
-    document.getElementById("log-status").textContent = `✅ Logged: ${note}`;
-    setTimeout(() => {
-      document.getElementById("log-status").textContent = "";
-    }, 1500);
-  }
-
   document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
   setTimeout(() => {
     document.getElementById("log-status").textContent = "";
   }, 1500);
 }
 
-function renderChoreButtons() {
-    const container = document.getElementById("chore-buttons");
-    container.innerHTML = "";
-  
-    // Render regular chores
-    allChores.forEach(chore => {
-      const button = document.createElement("button");
-      button.className = "chore-button";
-      button.textContent = chore;
-      button.onclick = () => logChore(chore);
-      container.appendChild(button);
-    });
-  
-    // Add special "Other" button
-    const otherButton = document.createElement("button");
-    otherButton.className = "chore-button other";
-    otherButton.textContent = "Other";
-    otherButton.onclick = () => logOtherChore();
-    container.appendChild(otherButton);
+// Log a custom "Other" chore with required note
+async function logOtherChore() {
+  let note = "";
+  while (!note) {
+    note = prompt("Describe the chore you completed:");
+    if (note === null) return; // User canceled
+    note = note.trim();
   }
 
+  const now = new Date();
+  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
+
+  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
+
+  await updateDoc(logRef, {
+    entries: arrayUnion({
+      chore: "Other",
+      timestamp: now.toISOString(),
+      note
+    })
+  });
+
+  document.getElementById("log-status").textContent = `✅ Logged: ${note}`;
+  setTimeout(() => {
+    document.getElementById("log-status").textContent = "";
+  }, 1500);
+}
+
+// Render buttons for each chore and a special "Other" button
+function renderChoreButtons() {
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+
+  // Regular chores
+  allChores.forEach(chore => {
+    const button = document.createElement("button");
+    button.className = "chore-button";
+    button.textContent = chore;
+    button.onclick = () => logChore(chore);
+    container.appendChild(button);
+  });
+
+  // Special "Other" button
+  const otherButton = document.createElement("button");
+  otherButton.className = "chore-button other";
+  otherButton.textContent = "Other";
+  otherButton.onclick = logOtherChore;
+  container.appendChild(otherButton);
+}
+
+// Show logged chores for current week
 async function showChoreHistory() {
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
@@ -117,6 +122,7 @@ async function showChoreHistory() {
   historyEl.classList.remove("hidden");
 }
 
+// Go back to user select screen
 function exitToHome() {
   selectedUser = null;
   document.getElementById("pin-input").value = "";
@@ -128,6 +134,7 @@ function exitToHome() {
   document.getElementById("history-list").innerHTML = "";
 }
 
+// User selects their name
 function selectUser(userId) {
   selectedUser = userId;
   document.getElementById("user-select").classList.add("hidden");
@@ -135,6 +142,7 @@ function selectUser(userId) {
   document.getElementById("pin-input").focus();
 }
 
+// Check user PIN
 async function submitPIN() {
   const inputPIN = document.getElementById("pin-input").value;
   const userRef = doc(db, "users", selectedUser);
@@ -157,7 +165,7 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
-// Enable submitting PIN with Enter
+// Enable submitting PIN with Enter key
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -165,7 +173,7 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose functions to HTML
+// Expose necessary functions globally
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
