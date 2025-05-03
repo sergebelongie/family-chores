@@ -15,7 +15,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let selectedUser = null;
-let pendingChore = null;
 
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -25,36 +24,8 @@ function getWeekNumber(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
-function renderChoreButtons() {
-  const container = document.getElementById("chore-buttons");
-  container.innerHTML = "";
-  allChores.forEach(chore => {
-    const button = document.createElement("button");
-    button.className = "chore-button";
-    button.textContent = chore;
-    button.onclick = () => openNotePrompt(chore);
-    container.appendChild(button);
-  });
-}
-
-function openNotePrompt(choreName) {
-  pendingChore = choreName;
-  document.getElementById("note-prompt-text").textContent = `Optional note for: ${choreName}`;
-  document.getElementById("note-input").value = "";
-  document.getElementById("note-modal").classList.remove("hidden");
-
-  setTimeout(() => {
-    document.getElementById("note-input").focus();
-  }, 10);
-}
-
-function closeNoteModal() {
-  document.getElementById("note-modal").classList.add("hidden");
-  pendingChore = null;
-}
-
-async function submitNote() {
-  const note = document.getElementById("note-input").value;
+async function logChore(choreName) {
+  const note = prompt(`Optional note for: ${choreName}`, "");
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
   const logRef = doc(db, "logs", `${selectedUser}_${week}`);
@@ -63,19 +34,28 @@ async function submitNote() {
 
   await updateDoc(logRef, {
     entries: arrayUnion({
-      chore: pendingChore,
+      chore: choreName,
       timestamp: now.toISOString(),
       note: note || ""
     })
   });
 
-  document.getElementById("note-modal").classList.add("hidden");
-  document.getElementById("log-status").textContent = `✅ Logged: ${pendingChore}`;
-  pendingChore = null;
-
+  document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
   setTimeout(() => {
     document.getElementById("log-status").textContent = "";
   }, 1500);
+}
+
+function renderChoreButtons() {
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+  allChores.forEach(chore => {
+    const button = document.createElement("button");
+    button.className = "chore-button";
+    button.textContent = chore;
+    button.onclick = () => logChore(chore);
+    container.appendChild(button);
+  });
 }
 
 async function showChoreHistory() {
@@ -148,10 +128,8 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose functions globally
+// Make global for buttons
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
-window.submitNote = submitNote;
-window.closeNoteModal = closeNoteModal;

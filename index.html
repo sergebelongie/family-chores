@@ -9,37 +9,6 @@
     button { font-size: 1.2em; margin: 0.5em; padding: 0.6em 1.2em; }
     .hidden { display: none; }
     .chore-button { display: block; margin: 0.5em auto; }
-
-    #note-modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    #note-box {
-      background: white;
-      padding: 1.5em;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-      text-align: left;
-    }
-
-    #note-box input {
-      width: 100%;
-      padding: 0.5em;
-      font-size: 1em;
-      margin-top: 0.5em;
-    }
-
-    #note-box button {
-      margin-top: 1em;
-      margin-right: 0.5em;
-    }
   </style>
 </head>
 <body>
@@ -70,17 +39,6 @@
     <div id="chore-history" class="hidden">
       <h3>This Week's Chore Log</h3>
       <ul id="history-list"></ul>
-    </div>
-  </div>
-
-  <!-- Note Modal -->
-  <div id="note-modal" class="hidden">
-    <div id="note-box">
-      <p id="note-prompt-text"></p>
-      <input type="text" id="note-input" placeholder="Optional note..." />
-      <br />
-      <button onclick="submitNote()">Log chore</button>
-      <button onclick="closeNoteModal()">Cancel</button>
     </div>
   </div>
 
