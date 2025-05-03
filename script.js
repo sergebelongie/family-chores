@@ -11,7 +11,6 @@ import {
 import { firebaseConfig } from './firebase-config.js';
 import { allChores } from './chores.js';
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -92,7 +91,6 @@ function exitToHome() {
   document.getElementById("history-list").innerHTML = "";
 }
 
-// Global handlers for HTML buttons
 function selectUser(userId) {
   selectedUser = userId;
   document.getElementById("user-select").classList.add("hidden");
@@ -122,7 +120,7 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
-// Enable pressing Enter to submit PIN
+// Enable submitting PIN with Enter
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -130,7 +128,7 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose functions for HTML buttons
+// Expose functions to HTML
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
