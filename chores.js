@@ -1,8 +1,20 @@
 export const allChores = [
-    "Brush teeth",
+    "Take dishes to kitchen sink after dinner",
+    "Brush & floss teeth before bed",
+    "Bring lunchbox & water bottle to sink",
+    "Choose school outfit",
+    "Put dirty clothes in hamper",
+    "Put away clean laundry in drawers/closets",
+    "Brush teeth before school",
+    "Rubber bands & brushing after meals",
+    "Give guinea pigs food & water",
+    "Help pack lunch for school",
+    "Put sunblock on face and arms",
+    "Independent reading",
+    "Put away toys/crafting materials",
     "Make bed",
-    "Feed guinea pigs",
-    "Put away toys",
-    "Read independently",
-    "Pack school bag"
+    "Tidy room",
+    "Help make dinner",
+    "Help wash dishes",
+    "Homework"
   ];
