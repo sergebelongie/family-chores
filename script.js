@@ -136,6 +136,10 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
+function closeNoteModal() {
+    document.getElementById("note-modal").classList.add("hidden");
+  }
+
 // Submit PIN with Enter key
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
