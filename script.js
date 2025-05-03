@@ -11,11 +11,11 @@ import {
 import { firebaseConfig } from './firebase-config.js';
 import { allChores } from './chores.js';
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let selectedUser = null;
+let pendingChore = null;
 
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -25,8 +25,31 @@ function getWeekNumber(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
-async function logChore(choreName) {
-  const note = prompt(`Optional note for: ${choreName}`, "");
+function renderChoreButtons() {
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+  allChores.forEach(chore => {
+    const button = document.createElement("button");
+    button.className = "chore-button";
+    button.textContent = chore;
+    button.onclick = () => openNotePrompt(chore);
+    container.appendChild(button);
+  });
+}
+
+function openNotePrompt(choreName) {
+  pendingChore = choreName;
+  document.getElementById("note-prompt-text").textContent = `Optional note for: ${choreName}`;
+  document.getElementById("note-input").value = "";
+  document.getElementById("note-modal").classList.remove("hidden");
+
+  setTimeout(() => {
+    document.getElementById("note-input").focus();
+  }, 10);
+}
+
+async function submitNote() {
+  const note = document.getElementById("note-input").value;
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
   const logRef = doc(db, "logs", `${selectedUser}_${week}`);
@@ -35,28 +58,19 @@ async function logChore(choreName) {
 
   await updateDoc(logRef, {
     entries: arrayUnion({
-      chore: choreName,
+      chore: pendingChore,
       timestamp: now.toISOString(),
       note: note || ""
     })
   });
 
-  document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
+  document.getElementById("note-modal").classList.add("hidden");
+  document.getElementById("log-status").textContent = `✅ Logged: ${pendingChore}`;
+  pendingChore = null;
+
   setTimeout(() => {
     document.getElementById("log-status").textContent = "";
   }, 1500);
-}
-
-function renderChoreButtons() {
-  const container = document.getElementById("chore-buttons");
-  container.innerHTML = "";
-  allChores.forEach(chore => {
-    const button = document.createElement("button");
-    button.className = "chore-button";
-    button.textContent = chore;
-    button.onclick = () => logChore(chore);
-    container.appendChild(button);
-  });
 }
 
 async function showChoreHistory() {
@@ -122,7 +136,7 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
-// Enable pressing Enter to submit PIN
+// Submit PIN with Enter key
 document.getElementById("pin-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -130,8 +144,9 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose functions for HTML buttons
+// Make functions accessible to HTML
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
+window.submitNote = submitNote;
