@@ -40,6 +40,34 @@ async function logChore(choreName) {
     })
   });
 
+  async function logOtherChore() {
+    let note = "";
+    while (!note) {
+      note = prompt("Describe the chore you completed:");
+      if (note === null) return; // user hit cancel
+      note = note.trim();
+    }
+  
+    const now = new Date();
+    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+    const logRef = doc(db, "logs", `${selectedUser}_${week}`);
+  
+    await setDoc(logRef, { user: selectedUser, week }, { merge: true });
+  
+    await updateDoc(logRef, {
+      entries: arrayUnion({
+        chore: "Other",
+        timestamp: now.toISOString(),
+        note
+      })
+    });
+  
+    document.getElementById("log-status").textContent = `✅ Logged: ${note}`;
+    setTimeout(() => {
+      document.getElementById("log-status").textContent = "";
+    }, 1500);
+  }
+
   document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
   setTimeout(() => {
     document.getElementById("log-status").textContent = "";
@@ -47,16 +75,25 @@ async function logChore(choreName) {
 }
 
 function renderChoreButtons() {
-  const container = document.getElementById("chore-buttons");
-  container.innerHTML = "";
-  allChores.forEach(chore => {
-    const button = document.createElement("button");
-    button.className = "chore-button";
-    button.textContent = chore;
-    button.onclick = () => logChore(chore);
-    container.appendChild(button);
-  });
-}
+    const container = document.getElementById("chore-buttons");
+    container.innerHTML = "";
+  
+    // Render regular chores
+    allChores.forEach(chore => {
+      const button = document.createElement("button");
+      button.className = "chore-button";
+      button.textContent = chore;
+      button.onclick = () => logChore(chore);
+      container.appendChild(button);
+    });
+  
+    // Add special "Other" button
+    const otherButton = document.createElement("button");
+    otherButton.className = "chore-button other";
+    otherButton.textContent = "Other";
+    otherButton.onclick = () => logOtherChore();
+    container.appendChild(otherButton);
+  }
 
 async function showChoreHistory() {
   const now = new Date();
