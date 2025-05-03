@@ -1,5 +1,5 @@
 export const allChores = [
-    "Take dishes to kitchen sink after dinner",
+    "Take dishes to kitchen sink after eating",
     "Brush & floss teeth before bed",
     "Bring lunchbox & water bottle to sink",
     "Choose school outfit",
