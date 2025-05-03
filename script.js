@@ -170,3 +170,4 @@ window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
+window.logOtherChore = logOtherChore;
