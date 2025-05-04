@@ -200,7 +200,7 @@ function updatePinDisplay() {
 }
 
 function generateKeypad() {
-  const keys = ['1','2','3','4','5','6','7','8','9','←','0','✅'];
+  const keys = ['1','2','3','4','5','6','7','8','9','←','0'];
   const keypad = document.getElementById("pin-keypad");
   keypad.innerHTML = "";
 
