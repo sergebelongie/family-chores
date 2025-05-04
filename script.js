@@ -162,8 +162,6 @@ function selectUser(user) {
   generateKeypad();
 }
 
-window.selectUser = selectUser;
-
 async function submitPIN() {
   const inputPIN = pinBuffer.join("");
   const userDoc = await getDoc(doc(db, "users", selectedUser));
@@ -272,7 +270,10 @@ const timestamp = now.toLocaleString(undefined, {
 buildElement.textContent = `${version} • Built ${timestamp}`;
 
 // Expose functions
+window.selectUser = selectUser;
 window.submitPIN = submitPIN;
-window.exitToHome = exitToHome;
 window.showChoreHistory = showChoreHistory;
+window.exitToHome = exitToHome;
 window.logOtherChore = logOtherChore;
+window.filterAdminLogs = filterAdminLogs;
+window.exportCSV = exportCSV;
