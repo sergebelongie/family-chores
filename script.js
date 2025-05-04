@@ -311,6 +311,56 @@ async function filterAdminLogs() {
   });
 }
 
+function exportCSV() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+
+  if (!startInput || !endInput) {
+    alert("Please select both start and end dates before exporting.");
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(endInput);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    if (snapshot.empty) {
+      alert("No logs found in that range.");
+      return;
+    }
+
+    const rows = [["User", "Chore", "Note", "Date", "Time"]];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const ts = data.timestamp.toDate();
+      const date = ts.toLocaleDateString();
+      const time = ts.toLocaleTimeString();
+      rows.push([data.user, data.chore, data.note || "", date, time]);
+    });
+
+    const csvContent = rows.map(r => r.map(field => `"${field}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chore_logs_${startInput}_to_${endInput}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
 // Expose functions globally
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
@@ -318,6 +368,7 @@ window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
 window.logOtherChore = logOtherChore;
 window.filterAdminLogs = filterAdminLogs;
+window.exportCSV = exportCSV;
 
 // Build/version info
 const buildElement = document.getElementById("build-info");
