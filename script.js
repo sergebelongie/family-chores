@@ -53,7 +53,6 @@ async function logChore(choreName) {
 
 // Log a custom "Other" chore with required note
 async function logOtherChore() {
-  const choreName = "Other";
   let note = "";
   while (!note) {
     note = prompt("Describe the chore you completed:");
@@ -63,19 +62,16 @@ async function logOtherChore() {
 
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
 
-  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
-
-  await updateDoc(logRef, {
-    entries: arrayUnion({
-      chore: choreName,
-      timestamp: now.toISOString(),
-      note
-    })
+  await addDoc(collection(db, "logs"), {
+    user: selectedUser,
+    chore: "Other",
+    timestamp: Timestamp.now(),
+    note,
+    week
   });
 
-  showToast(`✅ Logged: ${choreName}`);
+  showToast(`✅ Logged: ${note}`);
 }
 
 // Render buttons for each chore category + "Other"
