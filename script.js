@@ -161,6 +161,8 @@ function selectUser(user) {
   document.getElementById("pin-status").textContent = "";
 }
 
+window.selectUser = selectUser;
+
 // Check user PIN
 async function submitPIN() {
   const inputPIN = pinBuffer.join("");
