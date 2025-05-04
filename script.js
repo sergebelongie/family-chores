@@ -147,18 +147,18 @@ function exitToHome() {
 function selectUser(user) {
   selectedUser = user;
 
-  // Hide all major screens
   document.getElementById("user-select").classList.add("hidden");
   document.getElementById("chore-logger").classList.add("hidden");
   document.getElementById("admin-dashboard").classList.add("hidden");
 
-  // Show PIN entry screen
   document.getElementById("pin-entry").classList.remove("hidden");
 
-  // Reset PIN state
   pinBuffer = [];
   updatePinDisplay();
   document.getElementById("pin-status").textContent = "";
+
+  // ✅ Add this line
+  generateKeypad();
 }
 
 window.selectUser = selectUser;
