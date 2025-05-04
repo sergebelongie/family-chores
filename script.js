@@ -1,4 +1,4 @@
-import { initializeApp } from "./firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import {
   getFirestore,
   doc,
@@ -93,3 +93,6 @@ function exitToHome() {
 }
 
 document.getElementById("build-timestamp").textContent = new Date().toLocaleString();
+
+window.selectUser = selectUser;
+window.exitToHome = exitToHome;
