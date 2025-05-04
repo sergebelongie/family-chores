@@ -53,6 +53,7 @@ async function logChore(choreName) {
 
 // Log a custom "Other" chore with required note
 async function logOtherChore() {
+  const choreName = "Other";
   let note = "";
   while (!note) {
     note = prompt("Describe the chore you completed:");
@@ -68,7 +69,7 @@ async function logOtherChore() {
 
   await updateDoc(logRef, {
     entries: arrayUnion({
-      chore: "Other",
+      chore: choreName,
       timestamp: now.toISOString(),
       note
     })
