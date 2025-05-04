@@ -92,7 +92,7 @@ function renderChoreButtons() {
   // Add special "Other" button
   const otherButton = document.createElement("button");
   otherButton.className = "chore-button other";
-  otherButton.textContent = "Other";
+  otherButton.textContent = "🌀 Other";
   otherButton.onclick = logOtherChore;
   container.appendChild(otherButton);
 }
