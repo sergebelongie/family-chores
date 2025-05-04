@@ -189,7 +189,7 @@ async function submitPIN() {
   } else {
     document.getElementById("pin-entry").classList.add("hidden");
     document.getElementById("chore-logger").classList.remove("hidden");
-    document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
+    document.getElementById("user-title").textContent = `${userData.displayName}’s Chores`;
     renderChoreButtons();
   }
 }
