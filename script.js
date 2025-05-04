@@ -8,6 +8,7 @@ import {
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import { categorizedChores } from './chores.js';
 import { firebaseConfig } from './firebase-config.js';
 import { allChores } from './chores.js';
 
@@ -79,25 +80,30 @@ async function logOtherChore() {
 
 // Render buttons for each chore and a special "Other" button
 function renderChoreButtons() {
-  const container = document.getElementById("chore-buttons");
-  container.innerHTML = "";
-
-  // Regular chores
-  allChores.forEach(chore => {
-    const button = document.createElement("button");
-    button.className = "chore-button";
-    button.textContent = chore;
-    button.onclick = () => logChore(chore);
-    container.appendChild(button);
-  });
-
-  // Special "Other" button
-  const otherButton = document.createElement("button");
-  otherButton.className = "chore-button other";
-  otherButton.textContent = "Other";
-  otherButton.onclick = logOtherChore;
-  container.appendChild(otherButton);
-}
+    const container = document.getElementById("chore-buttons");
+    container.innerHTML = "";
+  
+    categorizedChores.forEach(group => {
+      const header = document.createElement("h3");
+      header.textContent = group.category;
+      container.appendChild(header);
+  
+      group.chores.forEach(chore => {
+        const button = document.createElement("button");
+        button.className = "chore-button";
+        button.textContent = chore;
+        button.onclick = () => logChore(chore);
+        container.appendChild(button);
+      });
+    });
+  
+    // Add special "Other" button
+    const otherButton = document.createElement("button");
+    otherButton.className = "chore-button other";
+    otherButton.textContent = "Other";
+    otherButton.onclick = logOtherChore;
+    container.appendChild(otherButton);
+  }
 
 // Show logged chores for current week
 async function showChoreHistory() {
