@@ -144,13 +144,14 @@ function exitToHome() {
 }
 
 // User selects their name
-function selectUser(userId) {
-  selectedUser = userId;
-  pinBuffer = [];
-  updatePinDisplay();
-  generateKeypad();
+function selectUser(user) {
+  selectedUser = user;
   document.getElementById("user-select").classList.add("hidden");
   document.getElementById("pin-entry").classList.remove("hidden");
+
+  // ✅ Hide chore and admin screens in case they're still showing
+  document.getElementById("chore-logger").classList.add("hidden");
+  document.getElementById("admin-dashboard").classList.add("hidden");
 }
 
 // Check user PIN
