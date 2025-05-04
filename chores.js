@@ -4,7 +4,7 @@ export const categorizedChores = [
       colorClass: "pastel-blue",
       chores: [
         "🪥 Brush teeth before school",
-        "👕 Choose school outfit for tomorrow",
+        "👕 Choose school outfit",
         "🌞 Put on sunblock",
         "🛏️ Make bed"
       ]
@@ -20,7 +20,7 @@ export const categorizedChores = [
       ]
     },
     {
-      category: "🧼 Hygiene & Self-care",
+      category: "🧼 Personal Care",
       colorClass: "pastel-green",
       chores: [
         "🪥 Brush & floss teeth before bed",
@@ -43,7 +43,8 @@ export const categorizedChores = [
       category: "🐹 Pet Care",
       colorClass: "pastel-orange",
       chores: [
-        "🐹 Give guinea pigs food & water"
+        "🐹 Give guinea pigs food & water",
+        "✨ Clean guinea pig cages"
       ]
     },
     {
