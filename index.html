@@ -4,35 +4,27 @@
   <meta charset="UTF-8">
   <title>Family Chores</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="styles.css">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
-
-  <!-- ✅ Toast message -->
   <div id="toast" class="hidden">✅ Chore logged!</div>
 
-  <!-- ✅ App title -->
   <h1>Family Chores</h1>
 
-  <!-- ✅ User Selection -->
   <div id="user-select">
     <p>Select your name:</p>
     <button onclick="selectUser('august')">August</button>
     <button onclick="selectUser('emilia')">Emilia</button>
   </div>
 
-  <!-- ✅ PIN Entry -->
   <div id="pin-entry" class="hidden">
-    <div id="pin-display" class="pin-dots">- - - -</div>
+    <div id="pin-display" class="pin-dots">----</div>
     <div id="pin-keypad" class="pin-keypad"></div>
     <div id="pin-status"></div>
   </div>
 
-  <!-- ✅ Chore Logging Screen -->
   <div id="chore-logger" class="hidden">
     <h2 id="user-title"></h2>
     <p>Tap a chore to log it for today:</p>
@@ -48,10 +40,8 @@
     </div>
   </div>
 
-  <!-- ✅ Admin Dashboard -->
   <div id="admin-dashboard" class="hidden">
     <h2>Admin Dashboard</h2>
-
     <div id="admin-filters" style="margin-bottom: 1em;">
       <label>
         Start:
@@ -64,37 +54,19 @@
       <button onclick="filterAdminLogs()">Filter Logs</button>
       <button onclick="exportCSV()" style="margin-left: 1em;">Export CSV</button>
     </div>
-
     <div id="admin-log-container">
       <ul id="admin-log-list"></ul>
     </div>
-
     <button onclick="exitToHome()">Exit</button>
   </div>
+  
+  <script type="module" src="script.js"></script>
 
-  <!-- ✅ Admin login shortcut -->
   <div id="admin-login-link">
     <button onclick="selectUser('admin')">Admin</button>
   </div>
 
-  <!-- ✅ Build info footer -->
   <div id="build-info" class="build-footer"></div>
-
-  <!-- ✅ Modal for optional note -->
-  <div id="note-modal" class="hidden">
-    <div id="note-box">
-      <h3>✅ Log this chore?</h3>
-      <p id="note-chore-name"></p>
-      <textarea id="note-input" rows="3" placeholder="Optional note..."></textarea>
-      <div class="note-buttons">
-        <button id="cancel-note">Cancel</button>
-        <button id="submit-note">Log Chore</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ JavaScript logic -->
-  <script type="module" src="script.js"></script>
 
 </body>
 </html>
