@@ -10,7 +10,7 @@ import {
 
 import { categorizedChores } from './chores.js';
 import { firebaseConfig } from './firebase-config.js';
-import { allChores } from './chores.js';
+import { categorizedChores } from './chores.js';
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
