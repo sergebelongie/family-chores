@@ -1,12 +1,17 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"; // Firebase SDK
-import { firebaseConfig } from "./firebase-config.js"; // Your config
+import { firebaseConfig } from "./firebase-config.js";
+import { allChores } from "./chores.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import {
   getFirestore,
   doc,
   getDoc,
   collection,
   addDoc,
-  Timestamp
+  Timestamp,
+  query,
+  where,
+  getDocs,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
@@ -80,6 +85,73 @@ async function submitPIN(inputPIN) {
   renderChoreButtons();
 }
 
+function renderChoreButtons() {
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+
+  allChores.forEach(chore => {
+    const btn = document.createElement("button");
+    btn.className = "chore-button";
+    btn.textContent = chore;
+    btn.onclick = () => logChore(chore);
+    container.appendChild(btn);
+  });
+
+  const otherButton = document.createElement("button");
+  otherButton.className = "chore-button other";
+  otherButton.textContent = "❓ Other";
+  otherButton.onclick = () => logOtherChore();
+  container.appendChild(otherButton);
+}
+
+function logChore(choreName, note = "") {
+  const logEntry = {
+    user: selectedUser,
+    chore: choreName,
+    note: note || null,
+    timestamp: Timestamp.now()
+  };
+  addDoc(collection(db, "logs"), logEntry)
+    .then(() => {
+      document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
+      setTimeout(() => {
+        document.getElementById("log-status").textContent = "";
+      }, 2000);
+    });
+}
+
+function logOtherChore() {
+  const note = prompt("What chore did you do?");
+  if (note) {
+    logChore("Other", note);
+  }
+}
+
+function showChoreHistory() {
+  document.getElementById("chore-history").classList.remove("hidden");
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+
+  const oneWeekAgo = Timestamp.fromDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+  const logsRef = collection(db, "logs");
+  const q = query(
+    logsRef,
+    where("user", "==", selectedUser),
+    where("timestamp", ">", oneWeekAgo),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const item = document.createElement("li");
+      const date = data.timestamp.toDate().toLocaleString();
+      item.textContent = `${date} — ${data.chore}${data.note ? " (" + data.note + ")" : ""}`;
+      list.appendChild(item);
+    });
+  });
+}
+
 function exitToHome() {
   selectedUser = null;
   pinBuffer = [];
@@ -90,10 +162,14 @@ function exitToHome() {
   document.getElementById("chore-logger").classList.add("hidden");
   document.getElementById("chore-history").classList.add("hidden");
   document.getElementById("history-list").innerHTML = "";
+  document.getElementById("log-status").textContent = "";
   document.getElementById("splash-screen").classList.remove("hidden");
 }
 
+// Show build timestamp
 document.getElementById("build-timestamp").textContent = new Date().toLocaleString();
 
+// Expose functions for HTML button onclick handlers
 window.selectUser = selectUser;
 window.exitToHome = exitToHome;
+window.showChoreHistory = showChoreHistory;
