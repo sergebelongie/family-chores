@@ -146,12 +146,19 @@ function exitToHome() {
 // User selects their name
 function selectUser(user) {
   selectedUser = user;
-  document.getElementById("user-select").classList.add("hidden");
-  document.getElementById("pin-entry").classList.remove("hidden");
 
-  // ✅ Hide chore and admin screens in case they're still showing
+  // Hide all major screens
+  document.getElementById("user-select").classList.add("hidden");
   document.getElementById("chore-logger").classList.add("hidden");
   document.getElementById("admin-dashboard").classList.add("hidden");
+
+  // Show PIN entry screen
+  document.getElementById("pin-entry").classList.remove("hidden");
+
+  // Reset PIN state
+  pinBuffer = [];
+  updatePinDisplay();
+  document.getElementById("pin-status").textContent = "";
 }
 
 // Check user PIN
