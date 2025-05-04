@@ -8,7 +8,6 @@ import {
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import { categorizedChores } from './chores.js';
 import { firebaseConfig } from './firebase-config.js';
 import { categorizedChores } from './chores.js';
 
@@ -78,32 +77,32 @@ async function logOtherChore() {
   }, 1500);
 }
 
-// Render buttons for each chore and a special "Other" button
+// Render buttons for each chore category + "Other"
 function renderChoreButtons() {
-    const container = document.getElementById("chore-buttons");
-    container.innerHTML = "";
-  
-    categorizedChores.forEach(group => {
-      const header = document.createElement("h3");
-      header.textContent = group.category;
-      container.appendChild(header);
-  
-      group.chores.forEach(chore => {
-        const button = document.createElement("button");
-        button.className = "chore-button";
-        button.textContent = chore;
-        button.onclick = () => logChore(chore);
-        container.appendChild(button);
-      });
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+
+  categorizedChores.forEach(group => {
+    const header = document.createElement("h3");
+    header.textContent = group.category;
+    container.appendChild(header);
+
+    group.chores.forEach(chore => {
+      const button = document.createElement("button");
+      button.className = "chore-button";
+      button.textContent = chore;
+      button.onclick = () => logChore(chore);
+      container.appendChild(button);
     });
-  
-    // Add special "Other" button
-    const otherButton = document.createElement("button");
-    otherButton.className = "chore-button other";
-    otherButton.textContent = "Other";
-    otherButton.onclick = logOtherChore;
-    container.appendChild(otherButton);
-  }
+  });
+
+  // Add special "Other" button
+  const otherButton = document.createElement("button");
+  otherButton.className = "chore-button other";
+  otherButton.textContent = "Other";
+  otherButton.onclick = logOtherChore;
+  container.appendChild(otherButton);
+}
 
 // Show logged chores for current week
 async function showChoreHistory() {
@@ -179,7 +178,7 @@ document.getElementById("pin-input").addEventListener("keydown", (e) => {
   }
 });
 
-// Expose necessary functions globally
+// Expose functions globally
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
