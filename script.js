@@ -127,6 +127,35 @@ async function showChoreHistory() {
   }
 
   historyEl.classList.remove("hidden");
+}async function showChoreHistory() {
+  const historySection = document.getElementById("chore-history");
+  const historyList = document.getElementById("history-list");
+  historyList.innerHTML = "";
+
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const q = query(
+    collection(db, "logs"),
+    where("user", "==", selectedUser),
+    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
+    orderBy("timestamp", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const dateObj = data.timestamp.toDate();
+    const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${data.chore}</strong><br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
+    historyList.appendChild(item);
+  });
+
+  historySection.classList.remove("hidden");
 }
 
 // Go back to user select screen
