@@ -108,26 +108,6 @@ function renderChoreButtons() {
 
 // Show logged chores for current week
 async function showChoreHistory() {
-  const now = new Date();
-  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
-  const logSnap = await getDoc(logRef);
-  const historyEl = document.getElementById("chore-history");
-  const listEl = document.getElementById("history-list");
-
-  if (!logSnap.exists()) {
-    listEl.innerHTML = "<li>No chores logged yet.</li>";
-  } else {
-    const data = logSnap.data();
-    const entries = data.entries || [];
-    listEl.innerHTML = entries.map(entry => {
-      const date = new Date(entry.timestamp).toLocaleString();
-      return `<li>${entry.chore} – <small>${date}</small>${entry.note ? `<br><em>${entry.note}</em>` : ""}</li>`;
-    }).join("");
-  }
-
-  historyEl.classList.remove("hidden");
-}async function showChoreHistory() {
   const historySection = document.getElementById("chore-history");
   const historyList = document.getElementById("history-list");
   historyList.innerHTML = "";
