@@ -4,15 +4,12 @@ import {
   doc,
   getDoc,
   addDoc,
-  setDoc,
-  updateDoc,
-  arrayUnion,
   collection,
   Timestamp,
   query,
   where,
-  getDocs,
-  orderBy
+  orderBy,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { firebaseConfig } from './firebase-config.js';
@@ -24,6 +21,7 @@ const db = getFirestore(app);
 let selectedUser = null;
 let pinBuffer = [];
 
+// Utility to get current week label
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const dayNum = d.getUTCDay() || 7;
@@ -32,49 +30,7 @@ function getWeekNumber(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
-function renderChoreButtons() {
-  const container = document.getElementById("chore-buttons");
-  container.innerHTML = "";
-
-  categorizedChores.forEach(group => {
-    group.chores.forEach(chore => {
-      const button = document.createElement("button");
-      button.className = `chore-button ${group.colorClass}`;
-      button.textContent = chore;
-      button.onclick = () => openNotePrompt(chore);
-      container.appendChild(button);
-    });
-  });
-
-  const otherButton = document.createElement("button");
-  otherButton.className = "chore-button other";
-  otherButton.textContent = "Other";
-  otherButton.onclick = logOtherChore;
-  container.appendChild(otherButton);
-}
-
-async function logOtherChore() {
-  let note = "";
-  while (!note) {
-    note = prompt("Describe the chore you completed:");
-    if (note === null) return;
-    note = note.trim();
-  }
-
-  const now = new Date();
-  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-
-  await addDoc(collection(db, "logs"), {
-    user: selectedUser,
-    chore: "Other",
-    timestamp: Timestamp.now(),
-    note,
-    week
-  });
-
-  showToast(`✅ Logged: ${note}`);
-}
-
+// Log chore with modal
 function openNotePrompt(choreName) {
   const modal = document.getElementById("note-modal");
   const choreLabel = document.getElementById("note-chore-name");
@@ -109,6 +65,7 @@ function openNotePrompt(choreName) {
   };
 }
 
+// Show toast
 function showToast(message = "✅ Chore logged!") {
   const toast = document.getElementById("toast");
   toast.textContent = message;
@@ -121,31 +78,192 @@ function showToast(message = "✅ Chore logged!") {
   }, 1500);
 }
 
-function exitToHome() {
-  selectedUser = null;
-  pinBuffer = [];
-  updatePinDisplay();
-  document.getElementById("pin-status").textContent = "";
-  document.getElementById("user-select").classList.remove("hidden");
+// Show user's chore log for past week
+async function showChoreHistory() {
+  const historySection = document.getElementById("chore-history");
+  const historyList = document.getElementById("history-list");
+  historyList.innerHTML = "";
+
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const q = query(
+    collection(db, "logs"),
+    where("user", "==", selectedUser),
+    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
+    orderBy("timestamp", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const date = data.timestamp.toDate();
+    const dateStr = date.toLocaleDateString();
+    const timeStr = date.toLocaleTimeString();
+    const note = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+    const item = document.createElement("li");
+    item.innerHTML = `${data.chore} – <small>${dateStr}, ${timeStr}</small>${note}`;
+    historyList.appendChild(item);
+  });
+
+  historySection.classList.remove("hidden");
+}
+
+// Show filtered logs in admin dashboard
+async function filterAdminLogs() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+  const dashboardList = document.getElementById("admin-log-list");
+  dashboardList.innerHTML = "";
+
+  if (!startInput || !endInput) {
+    dashboardList.innerHTML = "<li>Please select both start and end dates.</li>";
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  const endDate = new Date(endInput);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    dashboardList.innerHTML = "<li>No logs found in that range.</li>";
+    return;
+  }
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const ts = data.timestamp.toDate();
+    const date = ts.toLocaleDateString();
+    const time = ts.toLocaleTimeString();
+    const note = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${data.user}</strong> — ${data.chore}<br><small>${date}, ${time}</small>${note}`;
+    dashboardList.appendChild(item);
+  });
+}
+
+// CSV Export
+function exportCSV() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+
+  if (!startInput || !endInput) {
+    alert("Please select both start and end dates before exporting.");
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(endInput);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    if (snapshot.empty) {
+      alert("No logs found in that range.");
+      return;
+    }
+
+    const rows = [["User", "Chore", "Note", "Date", "Time"]];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const ts = data.timestamp.toDate();
+      rows.push([
+        data.user,
+        data.chore,
+        data.note || "",
+        ts.toLocaleDateString(),
+        ts.toLocaleTimeString()
+      ]);
+    });
+
+    const csvContent = rows.map(r => r.map(f => `"${f}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chore_logs_${startInput}_to_${endInput}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+// Admin view
+function showAdminDashboard() {
   document.getElementById("pin-entry").classList.add("hidden");
-  document.getElementById("chore-logger").classList.add("hidden");
-  document.getElementById("admin-dashboard").classList.add("hidden");
-  document.getElementById("chore-history").classList.add("hidden");
-  document.getElementById("history-list").innerHTML = "";
+  document.getElementById("admin-dashboard").classList.remove("hidden");
+  filterAdminLogs(); // show current logs
 }
 
-function selectUser(user) {
-  selectedUser = user;
-  document.getElementById("user-select").classList.add("hidden");
-  document.getElementById("pin-entry").classList.remove("hidden");
-  generateKeypad();
-  pinBuffer = [];
+// Chore buttons
+function renderChoreButtons() {
+  const container = document.getElementById("chore-buttons");
+  container.innerHTML = "";
+
+  categorizedChores.forEach(group => {
+    group.chores.forEach(chore => {
+      const button = document.createElement("button");
+      button.className = `chore-button ${group.colorClass}`;
+      button.textContent = chore;
+      button.onclick = () => openNotePrompt(chore);
+      container.appendChild(button);
+    });
+  });
+
+  const otherButton = document.createElement("button");
+  otherButton.className = "chore-button other";
+  otherButton.textContent = "Other";
+  otherButton.onclick = () => openNotePrompt("Other");
+  container.appendChild(otherButton);
+}
+
+// PIN Keypad
+function generateKeypad() {
+  const keys = ['1','2','3','4','5','6','7','8','9','←','0','✅'];
+  const keypad = document.getElementById("pin-keypad");
+  keypad.innerHTML = "";
+  keys.forEach(key => {
+    const btn = document.createElement("div");
+    btn.className = "pin-key";
+    btn.textContent = key;
+    btn.onclick = () => handleKey(key);
+    keypad.appendChild(btn);
+  });
+}
+
+function handleKey(key) {
+  if (key === "←") {
+    pinBuffer.pop();
+  } else if (pinBuffer.length < 4) {
+    pinBuffer.push(key);
+  }
+
   updatePinDisplay();
-  document.getElementById("pin-status").textContent = "";
+
+  if (pinBuffer.length === 4) {
+    submitPIN();
+  }
 }
 
-window.selectUser = selectUser;
+function updatePinDisplay() {
+  const display = document.getElementById("pin-display");
+  display.textContent = pinBuffer.map(() => "●").join(" ") || "- - - -";
+}
 
+// Submit PIN
 async function submitPIN() {
   const inputPIN = pinBuffer.join("");
   const userDoc = await getDoc(doc(db, "users", selectedUser));
@@ -177,180 +295,35 @@ async function submitPIN() {
   }
 }
 
-function updatePinDisplay() {
-  const pinDisplay = document.getElementById("pin-display");
-  pinDisplay.textContent = pinBuffer.map(() => "●").join(" ") || "- - - -";
-}
+// User selects name
+function selectUser(user) {
+  selectedUser = user;
+  document.getElementById("user-select").classList.add("hidden");
+  document.getElementById("chore-logger").classList.add("hidden");
+  document.getElementById("admin-dashboard").classList.add("hidden");
+  document.getElementById("pin-entry").classList.remove("hidden");
 
-function generateKeypad() {
-  const keys = ['1','2','3','4','5','6','7','8','9','←','0','✅'];
-  const keypad = document.getElementById("pin-keypad");
-  keypad.innerHTML = "";
-
-  keys.forEach(key => {
-    const btn = document.createElement("div");
-    btn.className = "pin-key";
-    btn.textContent = key;
-    btn.onclick = () => handleKey(key);
-    keypad.appendChild(btn);
-  });
-}
-
-function handleKey(key) {
-  if (key === "←") {
-    pinBuffer.pop();
-  } else if (pinBuffer.length < 4) {
-    pinBuffer.push(key);
-  }
-
+  pinBuffer = [];
   updatePinDisplay();
-
-  if (pinBuffer.length === 4) {
-    submitPIN();
-  }
+  document.getElementById("pin-status").textContent = "";
+  generateKeypad();
 }
 
-async function showChoreHistory() {
-  const historySection = document.getElementById("chore-history");
-  const historyList = document.getElementById("history-list");
-  historyList.innerHTML = "";
-
-  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-  const q = query(
-    collection(db, "logs"),
-    where("user", "==", selectedUser),
-    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
-    orderBy("timestamp", "desc")
-  );
-
-  const snapshot = await getDocs(q);
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const dateObj = data.timestamp.toDate();
-    const dateStr = dateObj.toLocaleDateString();
-    const timeStr = dateObj.toLocaleTimeString();
-    const noteStr = data.note ? `<br><em>${data.note}</em>` : "";
-    const item = document.createElement("li");
-    item.innerHTML = `${data.chore} — <small>${dateStr}, ${timeStr}</small>${noteStr}`;
-    historyList.appendChild(item);
-  });
-
-  historySection.classList.remove("hidden");
+// Exit back to user select
+function exitToHome() {
+  selectedUser = null;
+  pinBuffer = [];
+  updatePinDisplay();
+  document.getElementById("pin-status").textContent = "";
+  document.getElementById("user-select").classList.remove("hidden");
+  document.getElementById("pin-entry").classList.add("hidden");
+  document.getElementById("chore-logger").classList.add("hidden");
+  document.getElementById("admin-dashboard").classList.add("hidden");
+  document.getElementById("chore-history").classList.add("hidden");
+  document.getElementById("history-list").innerHTML = "";
 }
 
-function showAdminDashboard() {
-  document.getElementById("admin-dashboard").classList.remove("hidden");
-  filterAdminLogs();
-}
-
-function filterAdminLogs() {
-  const startInput = document.getElementById("filter-start").value;
-  const endInput = document.getElementById("filter-end").value;
-  const dashboardList = document.getElementById("admin-log-list");
-  dashboardList.innerHTML = "";
-
-  if (!startInput || !endInput) {
-    dashboardList.innerHTML = "<li>Please select both start and end dates.</li>";
-    return;
-  }
-
-  const startDate = new Date(startInput);
-  const endDate = new Date(endInput);
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(23, 59, 59, 999);
-
-  const q = query(
-    collection(db, "logs"),
-    where("timestamp", ">=", Timestamp.fromDate(startDate)),
-    where("timestamp", "<=", Timestamp.fromDate(endDate)),
-    orderBy("timestamp", "desc")
-  );
-
-  getDocs(q).then(snapshot => {
-    if (snapshot.empty) {
-      dashboardList.innerHTML = "<li>No logs found in that range.</li>";
-      return;
-    }
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const dateObj = data.timestamp.toDate();
-      const dateStr = dateObj.toLocaleDateString();
-      const timeStr = dateObj.toLocaleTimeString();
-      const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
-
-      const item = document.createElement("li");
-      item.innerHTML = `<strong>${data.user}</strong> — ${data.chore}<br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
-      dashboardList.appendChild(item);
-    });
-  });
-}
-
-function exportCSV() {
-  const startInput = document.getElementById("filter-start").value;
-  const endInput = document.getElementById("filter-end").value;
-
-  if (!startInput || !endInput) {
-    alert("Please select both start and end dates before exporting.");
-    return;
-  }
-
-  const startDate = new Date(startInput);
-  const endDate = new Date(endInput);
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(23, 59, 59, 999);
-
-  const q = query(
-    collection(db, "logs"),
-    where("timestamp", ">=", Timestamp.fromDate(startDate)),
-    where("timestamp", "<=", Timestamp.fromDate(endDate)),
-    orderBy("timestamp", "desc")
-  );
-
-  getDocs(q).then(snapshot => {
-    if (snapshot.empty) {
-      alert("No logs found in that range.");
-      return;
-    }
-
-    const rows = [["User", "Chore", "Note", "Date", "Time"]];
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const ts = data.timestamp.toDate();
-      rows.push([
-        data.user,
-        data.chore,
-        data.note || "",
-        ts.toLocaleDateString(),
-        ts.toLocaleTimeString()
-      ]);
-    });
-
-    const csvContent = rows.map(r => r.map(field => `"${field}"`).join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `chore_logs_${startInput}_to_${endInput}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
-}
-
-// Expose
-window.submitPIN = submitPIN;
-window.exitToHome = exitToHome;
-window.showChoreHistory = showChoreHistory;
-window.filterAdminLogs = filterAdminLogs;
-window.exportCSV = exportCSV;
-window.logOtherChore = logOtherChore;
-
-// Build info
+// Build/version info
 const buildElement = document.getElementById("build-info");
 const now = new Date();
 const version = "v1.0";
@@ -359,3 +332,11 @@ const timestamp = now.toLocaleString(undefined, {
   timeStyle: "short"
 });
 buildElement.textContent = `${version} • Built ${timestamp}`;
+
+// Expose
+window.selectUser = selectUser;
+window.submitPIN = submitPIN;
+window.showChoreHistory = showChoreHistory;
+window.exitToHome = exitToHome;
+window.filterAdminLogs = filterAdminLogs;
+window.exportCSV = exportCSV;

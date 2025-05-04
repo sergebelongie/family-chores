@@ -20,7 +20,7 @@ button {
 
 /* Utility */
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 /* PIN Entry */
@@ -84,7 +84,7 @@ button {
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Status messages */
+/* Optional: Status Messages */
 #log-status {
   margin-top: 1em;
   color: green;
@@ -98,28 +98,33 @@ button {
   background-color: #e0f0ff;
   border-color: #a0c4ff;
 }
+
 .pastel-yellow {
   background-color: #fffbe0;
   border-color: #ffe58f;
 }
+
 .pastel-green {
   background-color: #e0ffe0;
   border-color: #a2f3a2;
 }
+
 .pastel-purple {
   background-color: #f0e8ff;
   border-color: #d0bfff;
 }
+
 .pastel-orange {
   background-color: #fff0e0;
   border-color: #ffc49a;
 }
+
 .pastel-pink {
   background-color: #ffe0f0;
   border-color: #f8a4d8;
 }
 
-/* PIN Display and Keypad */
+/* PIN Dots + Keypad */
 .pin-dots {
   font-size: 2em;
   letter-spacing: 0.5em;
@@ -145,11 +150,12 @@ button {
   border: 1px solid #ccc;
   user-select: none;
 }
+
 .pin-key:active {
   background: #ddd;
 }
 
-/* Admin Panel */
+/* Admin Dashboard */
 #admin-log-container {
   max-height: 60vh;
   overflow-y: auto;
@@ -169,6 +175,7 @@ button {
   line-height: 1.4;
 }
 
+/* Admin login button (bottom-right corner) */
 #admin-login-link {
   position: fixed;
   bottom: 16px;
@@ -185,10 +192,12 @@ button {
   color: #555;
   cursor: pointer;
 }
+
 #admin-login-link button:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
+/* Build/version label */
 .build-footer {
   position: fixed;
   bottom: 4px;
@@ -200,7 +209,7 @@ button {
   z-index: 50;
 }
 
-/* ✅ Toast notification */
+/* Toast */
 #toast {
   position: fixed;
   top: 10px;
@@ -216,11 +225,12 @@ button {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 #toast.show {
   opacity: 1;
 }
 
-/* ✅ Note Modal */
+/* Modal for optional note */
 #note-modal {
   position: fixed;
   top: 0; left: 0;
@@ -257,7 +267,6 @@ button {
   border-radius: 8px;
   border: 1px solid #ccc;
   resize: none;
-  font-family: inherit;
 }
 
 .note-buttons {
@@ -265,6 +274,7 @@ button {
   display: flex;
   justify-content: space-between;
 }
+
 .note-buttons button {
   flex: 1;
   margin: 0 0.25em;
