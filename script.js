@@ -164,6 +164,15 @@ async function submitPIN(inputPIN) {
     updatePinDisplay();
     return;
   }
+  
+  if (selectedUser === "admin") {
+    showAdminDashboard();
+  } else {
+    document.getElementById("pin-entry").classList.add("hidden");
+    document.getElementById("chore-logger").classList.remove("hidden");
+    document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
+    renderChoreButtons();
+  }
 
   document.getElementById("pin-entry").classList.add("hidden");
   document.getElementById("chore-logger").classList.remove("hidden");
@@ -200,6 +209,31 @@ function handleKey(key) {
     pinBuffer.push(key);
   }
   updatePinDisplay();
+}
+
+function showAdminDashboard() {
+  document.getElementById("pin-entry").classList.add("hidden");
+  document.getElementById("admin-dashboard").classList.remove("hidden");
+
+  const dashboardList = document.getElementById("admin-log-list");
+  dashboardList.innerHTML = "";
+
+  const oneWeekAgo = Timestamp.fromDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">", oneWeekAgo),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const item = document.createElement("li");
+      const date = data.timestamp.toDate().toLocaleString();
+      item.textContent = `${data.user}: ${data.chore}${data.note ? " (" + data.note + ")" : ""} — ${date}`;
+      dashboardList.appendChild(item);
+    });
+  });
 }
 
 // Expose functions globally
