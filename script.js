@@ -127,7 +127,8 @@ async function showChoreHistory() {
 // Go back to user select screen
 function exitToHome() {
   selectedUser = null;
-  document.getElementById("pin-input").value = "";
+  pinBuffer = [];
+  updatePinDisplay();
   document.getElementById("pin-status").textContent = "";
   document.getElementById("user-select").classList.remove("hidden");
   document.getElementById("pin-entry").classList.add("hidden");
