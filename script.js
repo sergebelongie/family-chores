@@ -268,12 +268,56 @@ function showAdminDashboard() {
   });
 }
 
+async function filterAdminLogs() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+  const dashboardList = document.getElementById("admin-log-list");
+  dashboardList.innerHTML = "";
+
+  if (!startInput || !endInput) {
+    dashboardList.innerHTML = "<li>Please select both start and end dates.</li>";
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(endInput);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    dashboardList.innerHTML = "<li>No logs found in that range.</li>";
+    return;
+  }
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const dateObj = data.timestamp.toDate();
+    const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+
+    const item = document.createElement("li");
+    item.innerHTML = `<strong>${data.user}</strong> — ${data.chore}<br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
+    dashboardList.appendChild(item);
+  });
+}
+
 // Expose functions globally
 window.selectUser = selectUser;
 window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
 window.logOtherChore = logOtherChore;
+window.filterAdminLogs = filterAdminLogs;
 
 // Build/version info
 const buildElement = document.getElementById("build-info");

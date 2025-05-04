@@ -40,6 +40,17 @@
 
   <div id="admin-dashboard" class="hidden">
     <h2>Admin Dashboard</h2>
+    <div id="admin-filters" style="margin-bottom: 1em;">
+      <label>
+        Start:
+        <input type="date" id="filter-start">
+      </label>
+      <label style="margin-left: 1em;">
+        End:
+        <input type="date" id="filter-end">
+      </label>
+      <button onclick="filterAdminLogs()">Filter Logs</button>
+    </div>
     <div id="admin-log-container">
       <ul id="admin-log-list"></ul>
     </div>
