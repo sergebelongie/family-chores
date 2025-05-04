@@ -138,6 +138,7 @@ function exitToHome() {
   document.getElementById("user-select").classList.remove("hidden");
   document.getElementById("pin-entry").classList.add("hidden");
   document.getElementById("chore-logger").classList.add("hidden");
+  document.getElementById("admin-dashboard").classList.add("hidden");
   document.getElementById("chore-history").classList.add("hidden");
   document.getElementById("history-list").innerHTML = "";
 }
