@@ -4,6 +4,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  addDoc,
   setDoc,
   updateDoc,
   arrayUnion,
@@ -38,16 +39,13 @@ async function logChore(choreName) {
   const note = prompt(`Optional note for: ${choreName}`, "");
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-  const logRef = doc(db, "logs", `${selectedUser}_${week}`);
 
-  await setDoc(logRef, { user: selectedUser, week }, { merge: true });
-
-  await updateDoc(logRef, {
-    entries: arrayUnion({
-      chore: choreName,
-      timestamp: now.toISOString(),
-      note: note || ""
-    })
+  await addDoc(collection(db, "logs"), {
+    user: selectedUser,
+    chore: choreName,
+    timestamp: Timestamp.now(),
+    note: note || "",
+    week
   });
 
   document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
