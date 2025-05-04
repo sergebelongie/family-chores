@@ -203,3 +203,23 @@ button {
   user-select: none;
   z-index: 50;
 }
+
+#toast {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF50; /* Green background */
+  color: white;
+  padding: 0.8em 1.2em;
+  border-radius: 10px;
+  font-size: 1.1em;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#toast.show {
+  opacity: 1;
+}

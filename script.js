@@ -48,10 +48,7 @@ async function logChore(choreName) {
     week
   });
 
-  document.getElementById("log-status").textContent = `✅ Logged: ${choreName}`;
-  setTimeout(() => {
-    document.getElementById("log-status").textContent = "";
-  }, 1500);
+  showToast(`✅ Logged: ${choreName}`);
 }
 
 // Log a custom "Other" chore with required note
@@ -77,10 +74,7 @@ async function logOtherChore() {
     })
   });
 
-  document.getElementById("log-status").textContent = `✅ Logged: ${note}`;
-  setTimeout(() => {
-    document.getElementById("log-status").textContent = "";
-  }, 1500);
+  showToast(`✅ Logged: ${choreName}`);
 }
 
 // Render buttons for each chore category + "Other"
@@ -359,6 +353,18 @@ function exportCSV() {
     link.click();
     document.body.removeChild(link);
   });
+}
+
+function showToast(message = "✅ Chore logged!") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.classList.add("hidden"), 300); // wait for fade-out
+  }, 1500);
 }
 
 // Expose functions globally
