@@ -155,23 +155,26 @@ function selectUser(userId) {
 }
 
 // Check user PIN
-async function submitPIN(inputPIN) {
-  const userRef = doc(db, "users", selectedUser);
-  const userSnap = await getDoc(userRef);
+async function submitPIN() {
+  const inputPIN = pinBuffer.join("");
+  const userDoc = await getDoc(doc(db, "users", selectedUser));
 
-  if (!userSnap.exists()) {
+  if (!userDoc.exists()) {
     document.getElementById("pin-status").textContent = "User not found.";
+    pinBuffer = [];
+    updatePinDisplay();
     return;
   }
 
-  const userData = userSnap.data();
+  const userData = userDoc.data();
+
   if (userData.pin !== inputPIN) {
     document.getElementById("pin-status").textContent = "Incorrect PIN.";
     pinBuffer = [];
     updatePinDisplay();
     return;
   }
-  
+
   if (selectedUser === "admin") {
     showAdminDashboard();
   } else {
@@ -180,11 +183,6 @@ async function submitPIN(inputPIN) {
     document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
     renderChoreButtons();
   }
-
-  document.getElementById("pin-entry").classList.add("hidden");
-  document.getElementById("chore-logger").classList.remove("hidden");
-  document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
-  renderChoreButtons();
 }
 
 function updatePinDisplay() {
