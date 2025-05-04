@@ -92,3 +92,33 @@ body {
   #pin-status {
     color: red;
   }
+
+  .pastel-blue {
+    background-color: #e0f0ff;
+    border-color: #a0c4ff;
+  }
+  
+  .pastel-yellow {
+    background-color: #fffbe0;
+    border-color: #ffe58f;
+  }
+  
+  .pastel-green {
+    background-color: #e0ffe0;
+    border-color: #a2f3a2;
+  }
+  
+  .pastel-purple {
+    background-color: #f0e8ff;
+    border-color: #d0bfff;
+  }
+  
+  .pastel-orange {
+    background-color: #fff0e0;
+    border-color: #ffc49a;
+  }
+  
+  .pastel-pink {
+    background-color: #ffe0f0;
+    border-color: #f8a4d8;
+  }

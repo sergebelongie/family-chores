@@ -88,11 +88,12 @@ function renderChoreButtons() {
     container.appendChild(header);
 
     group.chores.forEach(chore => {
-      const button = document.createElement("button");
-      button.className = "chore-button";
-      button.textContent = chore;
-      button.onclick = () => logChore(chore);
-      container.appendChild(button);
+        const button = document.createElement("button");
+        button.className = `chore-button ${group.colorClass}`;
+        button.textContent = chore;
+        button.onclick = () => logChore(chore);
+        container.appendChild(button);
+      });
     });
   });
 

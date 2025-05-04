@@ -1,6 +1,7 @@
 export const categorizedChores = [
     {
       category: "🛌 Morning Routine",
+      colorClass: "pastel-blue",
       chores: [
         "🪥 Brush teeth before school",
         "👕 Choose school outfit for tomorrow",
@@ -10,6 +11,7 @@ export const categorizedChores = [
     },
     {
       category: "🏫 School Prep / Follow-up",
+      colorClass: "pastel-yellow",
       chores: [
         "💧 Bring lunchbox & water bottle to sink",
         "🦷 Brushing after meals during school",
@@ -18,7 +20,8 @@ export const categorizedChores = [
       ]
     },
     {
-      category: "🧼 Personal Care",
+      category: "🧼 Hygiene & Self-care",
+      colorClass: "pastel-green",
       chores: [
         "🪥 Brush & floss teeth before bed",
         "🧺 Put dirty clothes in hamper",
@@ -28,6 +31,7 @@ export const categorizedChores = [
     },
     {
       category: "🏠 Household Help",
+      colorClass: "pastel-purple",
       chores: [
         "🍽️ Take dishes to kitchen sink after eating",
         "👩‍🍳 Help make dinner",
@@ -37,13 +41,14 @@ export const categorizedChores = [
     },
     {
       category: "🐹 Pet Care",
+      colorClass: "pastel-orange",
       chores: [
-        "🐹 Give guinea pigs food & water",
-        "✨ Clean guinea pig cages"
+        "🐹 Give guinea pigs food & water"
       ]
     },
     {
       category: "🎨 Personal Projects",
+      colorClass: "pastel-pink",
       chores: [
         "📚 Independent reading",
         "🧩 Put away toys/crafting materials"
