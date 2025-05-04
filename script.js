@@ -208,3 +208,5 @@ window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
 window.logOtherChore = logOtherChore;
+
+document.getElementById("build-timestamp").textContent = new Date().toLocaleString();
