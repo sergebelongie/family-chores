@@ -152,3 +152,22 @@ body {
   .pin-key:active {
     background: #ddd;
   }
+
+  #splash-screen {
+    background-image: url("wallpaper.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #user-select {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1.5em;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
