@@ -20,7 +20,7 @@ button {
 
 /* Utility */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* PIN Entry */
@@ -84,7 +84,7 @@ button {
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Optional: Status Messages */
+/* Status messages */
 #log-status {
   margin-top: 1em;
   color: green;
@@ -93,36 +93,33 @@ button {
   color: red;
 }
 
+/* Pastel categories */
 .pastel-blue {
   background-color: #e0f0ff;
   border-color: #a0c4ff;
 }
-
 .pastel-yellow {
   background-color: #fffbe0;
   border-color: #ffe58f;
 }
-
 .pastel-green {
   background-color: #e0ffe0;
   border-color: #a2f3a2;
 }
-
 .pastel-purple {
   background-color: #f0e8ff;
   border-color: #d0bfff;
 }
-
 .pastel-orange {
   background-color: #fff0e0;
   border-color: #ffc49a;
 }
-
 .pastel-pink {
   background-color: #ffe0f0;
   border-color: #f8a4d8;
 }
 
+/* PIN Display and Keypad */
 .pin-dots {
   font-size: 2em;
   letter-spacing: 0.5em;
@@ -148,11 +145,11 @@ button {
   border: 1px solid #ccc;
   user-select: none;
 }
-
 .pin-key:active {
   background: #ddd;
 }
 
+/* Admin Panel */
 #admin-log-container {
   max-height: 60vh;
   overflow-y: auto;
@@ -188,7 +185,6 @@ button {
   color: #555;
   cursor: pointer;
 }
-
 #admin-login-link button:hover {
   background: rgba(0, 0, 0, 0.2);
 }
@@ -204,12 +200,13 @@ button {
   z-index: 50;
 }
 
+/* ✅ Toast notification */
 #toast {
   position: fixed;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: #4CAF50; /* Green background */
+  background: #4CAF50;
   color: white;
   padding: 0.8em 1.2em;
   border-radius: 10px;
@@ -219,11 +216,11 @@ button {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-
 #toast.show {
   opacity: 1;
 }
 
+/* ✅ Note Modal */
 #note-modal {
   position: fixed;
   top: 0; left: 0;
@@ -249,11 +246,6 @@ button {
   margin-top: 0;
 }
 
-#note-box {
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
 #note-chore-name {
   font-weight: bold;
   margin-bottom: 0.5em;
@@ -265,6 +257,7 @@ button {
   border-radius: 8px;
   border: 1px solid #ccc;
   resize: none;
+  font-family: inherit;
 }
 
 .note-buttons {
@@ -272,7 +265,6 @@ button {
   display: flex;
   justify-content: space-between;
 }
-
 .note-buttons button {
   flex: 1;
   margin: 0 0.25em;
