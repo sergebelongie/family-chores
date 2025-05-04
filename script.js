@@ -15,6 +15,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let selectedUser = null;
+let pinBuffer = [];
 
 // Get ISO-style week label
 function getWeekNumber(date) {
@@ -138,14 +139,15 @@ function exitToHome() {
 // User selects their name
 function selectUser(userId) {
   selectedUser = userId;
+  pinBuffer = [];
+  updatePinDisplay();
+  generateKeypad();
   document.getElementById("user-select").classList.add("hidden");
   document.getElementById("pin-entry").classList.remove("hidden");
-  document.getElementById("pin-input").focus();
 }
 
 // Check user PIN
-async function submitPIN() {
-  const inputPIN = document.getElementById("pin-input").value;
+async function submitPIN(inputPIN) {
   const userRef = doc(db, "users", selectedUser);
   const userSnap = await getDoc(userRef);
 
@@ -157,6 +159,8 @@ async function submitPIN() {
   const userData = userSnap.data();
   if (userData.pin !== inputPIN) {
     document.getElementById("pin-status").textContent = "Incorrect PIN.";
+    pinBuffer = [];
+    updatePinDisplay();
     return;
   }
 
@@ -166,13 +170,36 @@ async function submitPIN() {
   renderChoreButtons();
 }
 
-// Enable submitting PIN with Enter key
-document.getElementById("pin-input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    submitPIN();
+function updatePinDisplay() {
+  const pinDisplay = document.getElementById("pin-display");
+  pinDisplay.textContent = pinBuffer.map(() => "●").join(" ") || "- - - -";
+}
+
+function generateKeypad() {
+  const keys = ['1','2','3','4','5','6','7','8','9','←','0','✅'];
+  const keypad = document.getElementById("pin-keypad");
+  keypad.innerHTML = "";
+
+  keys.forEach(key => {
+    const btn = document.createElement("div");
+    btn.className = "pin-key";
+    btn.textContent = key;
+    btn.onclick = () => handleKey(key);
+    keypad.appendChild(btn);
+  });
+}
+
+function handleKey(key) {
+  if (key === '←') {
+    pinBuffer.pop();
+  } else if (key === '✅') {
+    submitPIN(pinBuffer.join(""));
+    return;
+  } else if (pinBuffer.length < 6) {
+    pinBuffer.push(key);
   }
-});
+  updatePinDisplay();
+}
 
 // Expose functions globally
 window.selectUser = selectUser;

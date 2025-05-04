@@ -122,3 +122,33 @@ body {
     background-color: #ffe0f0;
     border-color: #f8a4d8;
   }
+
+  .pin-dots {
+    font-size: 2em;
+    letter-spacing: 0.5em;
+    margin: 1em auto;
+    width: 8em;
+    text-align: center;
+  }
+  
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    gap: 0.5em;
+    justify-content: center;
+    margin-bottom: 1em;
+  }
+  
+  .pin-key {
+    font-size: 1.5em;
+    padding: 0.5em;
+    background: #eee;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    user-select: none;
+  }
+  
+  .pin-key:active {
+    background: #ddd;
+  }
