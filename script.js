@@ -1,4 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"; // Firebase SDK
+import { firebaseConfig } from "./firebase-config.js"; // Your config
 import {
   getFirestore,
   doc,
