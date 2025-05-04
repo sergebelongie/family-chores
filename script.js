@@ -387,6 +387,7 @@ const timestamp = now.toLocaleString(undefined, {
 buildElement.textContent = `${version} • Built ${timestamp}`;
 
 function openNotePrompt(choreName) {
+  console.log("openNotePrompt called with:", choreName);
   const modal = document.getElementById("note-modal");
   const choreLabel = document.getElementById("note-chore-name");
   const input = document.getElementById("note-input");
