@@ -24,15 +24,6 @@ const db = getFirestore(app);
 let selectedUser = null;
 let pinBuffer = [];
 
-// DOMContentLoaded safety check
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("note-modal");
-  if (modal) {
-    modal.classList.add("hidden");
-  }
-});
-
-// Utility
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const dayNum = d.getUTCDay() || 7;
@@ -41,47 +32,6 @@ function getWeekNumber(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
-function showToast(message = "✅ Chore logged!") {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.classList.add("hidden"), 300);
-  }, 1500);
-}
-
-// Chore Logging
-async function logChore(choreName, note = "") {
-  const now = new Date();
-  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
-
-  await addDoc(collection(db, "logs"), {
-    user: selectedUser,
-    chore: choreName,
-    timestamp: Timestamp.now(),
-    note,
-    week
-  });
-
-  showToast(`✅ Logged: ${choreName}`);
-}
-
-// Other chore with required note
-async function logOtherChore() {
-  let note = "";
-  while (!note) {
-    note = prompt("Describe the chore you completed:");
-    if (note === null) return;
-    note = note.trim();
-  }
-
-  await logChore("Other", note);
-}
-
-// Render buttons
 function renderChoreButtons() {
   const container = document.getElementById("chore-buttons");
   container.innerHTML = "";
@@ -103,39 +53,74 @@ function renderChoreButtons() {
   container.appendChild(otherButton);
 }
 
-// Chore history
-async function showChoreHistory() {
-  const historySection = document.getElementById("chore-history");
-  const historyList = document.getElementById("history-list");
-  historyList.innerHTML = "";
+async function logOtherChore() {
+  let note = "";
+  while (!note) {
+    note = prompt("Describe the chore you completed:");
+    if (note === null) return;
+    note = note.trim();
+  }
 
-  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
 
-  const q = query(
-    collection(db, "logs"),
-    where("user", "==", selectedUser),
-    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
-    orderBy("timestamp", "desc")
-  );
-
-  const snapshot = await getDocs(q);
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const dateObj = data.timestamp.toDate();
-    const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-    const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
-
-    const item = document.createElement("li");
-    item.innerHTML = `<strong>${data.chore}</strong><br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
-    historyList.appendChild(item);
+  await addDoc(collection(db, "logs"), {
+    user: selectedUser,
+    chore: "Other",
+    timestamp: Timestamp.now(),
+    note,
+    week
   });
 
-  historySection.classList.remove("hidden");
+  showToast(`✅ Logged: ${note}`);
 }
 
-// UI Navigation
+function openNotePrompt(choreName) {
+  const modal = document.getElementById("note-modal");
+  const choreLabel = document.getElementById("note-chore-name");
+  const input = document.getElementById("note-input");
+  const submitBtn = document.getElementById("submit-note");
+  const cancelBtn = document.getElementById("cancel-note");
+
+  choreLabel.textContent = choreName;
+  input.value = "";
+  modal.classList.remove("hidden");
+
+  cancelBtn.onclick = () => {
+    modal.classList.add("hidden");
+  };
+
+  submitBtn.onclick = async () => {
+    const note = input.value.trim();
+    modal.classList.add("hidden");
+
+    const now = new Date();
+    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+
+    await addDoc(collection(db, "logs"), {
+      user: selectedUser,
+      chore: choreName,
+      timestamp: Timestamp.now(),
+      note: note || "",
+      week
+    });
+
+    showToast(`✅ Logged: ${choreName}`);
+  };
+}
+
+function showToast(message = "✅ Chore logged!") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.classList.add("hidden"), 300);
+  }, 1500);
+}
+
 function exitToHome() {
   selectedUser = null;
   pinBuffer = [];
@@ -152,15 +137,14 @@ function exitToHome() {
 function selectUser(user) {
   selectedUser = user;
   document.getElementById("user-select").classList.add("hidden");
-  document.getElementById("chore-logger").classList.add("hidden");
-  document.getElementById("admin-dashboard").classList.add("hidden");
   document.getElementById("pin-entry").classList.remove("hidden");
-
+  generateKeypad();
   pinBuffer = [];
   updatePinDisplay();
   document.getElementById("pin-status").textContent = "";
-  generateKeypad();
 }
+
+window.selectUser = selectUser;
 
 async function submitPIN() {
   const inputPIN = pinBuffer.join("");
@@ -182,10 +166,11 @@ async function submitPIN() {
     return;
   }
 
+  document.getElementById("pin-entry").classList.add("hidden");
+
   if (selectedUser === "admin") {
     showAdminDashboard();
   } else {
-    document.getElementById("pin-entry").classList.add("hidden");
     document.getElementById("chore-logger").classList.remove("hidden");
     document.getElementById("user-title").textContent = `${userData.displayName}'s Chores`;
     renderChoreButtons();
@@ -214,10 +199,8 @@ function generateKeypad() {
 function handleKey(key) {
   if (key === "←") {
     pinBuffer.pop();
-  } else {
-    if (pinBuffer.length < 4) {
-      pinBuffer.push(key);
-    }
+  } else if (pinBuffer.length < 4) {
+    pinBuffer.push(key);
   }
 
   updatePinDisplay();
@@ -227,37 +210,145 @@ function handleKey(key) {
   }
 }
 
-// Modal for notes
-function openNotePrompt(choreName) {
-  if (!choreName) return;
-  const modal = document.getElementById("note-modal");
-  const choreLabel = document.getElementById("note-chore-name");
-  const input = document.getElementById("note-input");
-  const submitBtn = document.getElementById("submit-note");
-  const cancelBtn = document.getElementById("cancel-note");
+async function showChoreHistory() {
+  const historySection = document.getElementById("chore-history");
+  const historyList = document.getElementById("history-list");
+  historyList.innerHTML = "";
 
-  choreLabel.textContent = choreName;
-  input.value = "";
-  modal.classList.remove("hidden");
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  cancelBtn.onclick = () => {
-    modal.classList.add("hidden");
-  };
+  const q = query(
+    collection(db, "logs"),
+    where("user", "==", selectedUser),
+    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
+    orderBy("timestamp", "desc")
+  );
 
-  submitBtn.onclick = async () => {
-    const note = input.value.trim();
-    modal.classList.add("hidden");
-    await logChore(choreName, note);
-  };
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const dateObj = data.timestamp.toDate();
+    const dateStr = dateObj.toLocaleDateString();
+    const timeStr = dateObj.toLocaleTimeString();
+    const noteStr = data.note ? `<br><em>${data.note}</em>` : "";
+    const item = document.createElement("li");
+    item.innerHTML = `${data.chore} — <small>${dateStr}, ${timeStr}</small>${noteStr}`;
+    historyList.appendChild(item);
+  });
+
+  historySection.classList.remove("hidden");
 }
 
-// Admin dashboard placeholder
 function showAdminDashboard() {
-  document.getElementById("pin-entry").classList.add("hidden");
   document.getElementById("admin-dashboard").classList.remove("hidden");
-
-  // Add your existing dashboard log loading logic here
+  filterAdminLogs();
 }
+
+function filterAdminLogs() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+  const dashboardList = document.getElementById("admin-log-list");
+  dashboardList.innerHTML = "";
+
+  if (!startInput || !endInput) {
+    dashboardList.innerHTML = "<li>Please select both start and end dates.</li>";
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  const endDate = new Date(endInput);
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    if (snapshot.empty) {
+      dashboardList.innerHTML = "<li>No logs found in that range.</li>";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const dateObj = data.timestamp.toDate();
+      const dateStr = dateObj.toLocaleDateString();
+      const timeStr = dateObj.toLocaleTimeString();
+      const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+
+      const item = document.createElement("li");
+      item.innerHTML = `<strong>${data.user}</strong> — ${data.chore}<br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
+      dashboardList.appendChild(item);
+    });
+  });
+}
+
+function exportCSV() {
+  const startInput = document.getElementById("filter-start").value;
+  const endInput = document.getElementById("filter-end").value;
+
+  if (!startInput || !endInput) {
+    alert("Please select both start and end dates before exporting.");
+    return;
+  }
+
+  const startDate = new Date(startInput);
+  const endDate = new Date(endInput);
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
+
+  const q = query(
+    collection(db, "logs"),
+    where("timestamp", ">=", Timestamp.fromDate(startDate)),
+    where("timestamp", "<=", Timestamp.fromDate(endDate)),
+    orderBy("timestamp", "desc")
+  );
+
+  getDocs(q).then(snapshot => {
+    if (snapshot.empty) {
+      alert("No logs found in that range.");
+      return;
+    }
+
+    const rows = [["User", "Chore", "Note", "Date", "Time"]];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const ts = data.timestamp.toDate();
+      rows.push([
+        data.user,
+        data.chore,
+        data.note || "",
+        ts.toLocaleDateString(),
+        ts.toLocaleTimeString()
+      ]);
+    });
+
+    const csvContent = rows.map(r => r.map(field => `"${field}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chore_logs_${startInput}_to_${endInput}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+// Expose
+window.submitPIN = submitPIN;
+window.exitToHome = exitToHome;
+window.showChoreHistory = showChoreHistory;
+window.filterAdminLogs = filterAdminLogs;
+window.exportCSV = exportCSV;
+window.logOtherChore = logOtherChore;
 
 // Build info
 const buildElement = document.getElementById("build-info");
@@ -268,12 +359,3 @@ const timestamp = now.toLocaleString(undefined, {
   timeStyle: "short"
 });
 buildElement.textContent = `${version} • Built ${timestamp}`;
-
-// Expose functions
-window.selectUser = selectUser;
-window.submitPIN = submitPIN;
-window.showChoreHistory = showChoreHistory;
-window.exitToHome = exitToHome;
-window.logOtherChore = logOtherChore;
-window.filterAdminLogs = filterAdminLogs;
-window.exportCSV = exportCSV;
