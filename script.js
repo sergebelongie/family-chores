@@ -204,15 +204,20 @@ function generateKeypad() {
 }
 
 function handleKey(key) {
-  if (key === '←') {
+  if (key === "←") {
     pinBuffer.pop();
-  } else if (key === '✅') {
-    submitPIN(pinBuffer.join(""));
-    return;
-  } else if (pinBuffer.length < 6) {
-    pinBuffer.push(key);
+  } else {
+    if (pinBuffer.length < 4) {
+      pinBuffer.push(key);
+    }
   }
+
   updatePinDisplay();
+
+  // ✅ Auto-submit when 4 digits entered
+  if (pinBuffer.length === 4) {
+    submitPIN();
+  }
 }
 
 function showAdminDashboard() {
