@@ -255,3 +255,13 @@ window.submitPIN = submitPIN;
 window.showChoreHistory = showChoreHistory;
 window.exitToHome = exitToHome;
 window.logOtherChore = logOtherChore;
+
+// Build/version info
+const buildElement = document.getElementById("build-info");
+const now = new Date();
+const version = "v1.0";  // You can bump this manually
+const timestamp = now.toLocaleString(undefined, {
+  dateStyle: "medium",
+  timeStyle: "short"
+});
+buildElement.textContent = `${version} • Built ${timestamp}`;

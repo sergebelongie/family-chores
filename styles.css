@@ -192,3 +192,14 @@ button {
 #admin-login-link button:hover {
   background: rgba(0, 0, 0, 0.2);
 }
+
+.build-footer {
+  position: fixed;
+  bottom: 4px;
+  left: 8px;
+  font-size: 0.7em;
+  color: #888;
+  opacity: 0.7;
+  user-select: none;
+  z-index: 50;
+}
