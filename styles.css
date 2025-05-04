@@ -152,3 +152,22 @@ button {
 .pin-key:active {
   background: #ddd;
 }
+
+#admin-log-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1em;
+  margin: 1em auto;
+  max-width: 600px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#admin-log-list li {
+  padding: 0.5em 0.8em;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  line-height: 1.4;
+}

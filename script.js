@@ -234,8 +234,12 @@ function showAdminDashboard() {
     snapshot.forEach(doc => {
       const data = doc.data();
       const item = document.createElement("li");
-      const date = data.timestamp.toDate().toLocaleString();
-      item.textContent = `${data.user}: ${data.chore}${data.note ? " (" + data.note + ")" : ""} — ${date}`;
+      const dateObj = data.timestamp.toDate();
+      const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+
+      item.innerHTML = `<strong>${data.user}</strong> — ${data.chore}<br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
       dashboardList.appendChild(item);
     });
   });
