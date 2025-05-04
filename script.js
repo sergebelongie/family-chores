@@ -87,7 +87,7 @@ function renderChoreButtons() {
       const button = document.createElement("button");
       button.className = `chore-button ${group.colorClass}`;
       button.textContent = chore;
-      button.onclick = () => logChore(chore);
+      button.onclick = () => openNotePrompt(chore);
       container.appendChild(button);
     });
   });
@@ -385,3 +385,38 @@ const timestamp = now.toLocaleString(undefined, {
   timeStyle: "short"
 });
 buildElement.textContent = `${version} • Built ${timestamp}`;
+
+function openNotePrompt(choreName) {
+  const modal = document.getElementById("note-modal");
+  const choreLabel = document.getElementById("note-chore-name");
+  const input = document.getElementById("note-input");
+  const submitBtn = document.getElementById("submit-note");
+  const cancelBtn = document.getElementById("cancel-note");
+
+  choreLabel.textContent = choreName;
+  input.value = "";
+
+  modal.classList.remove("hidden");
+
+  cancelBtn.onclick = () => {
+    modal.classList.add("hidden");
+  };
+
+  submitBtn.onclick = async () => {
+    const note = input.value.trim();
+    modal.classList.add("hidden");
+
+    const now = new Date();
+    const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
+
+    await addDoc(collection(db, "logs"), {
+      user: selectedUser,
+      chore: choreName,
+      timestamp: Timestamp.now(),
+      note: note || "",
+      week
+    });
+
+    showToast(`✅ Logged: ${choreName}`);
+  };
+}
