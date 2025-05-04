@@ -2,7 +2,7 @@
 body {
   font-family: sans-serif;
   text-align: center;
-  padding: 0;
+  padding: 2em;
   margin: 0;
   background: #fafcff;
 }
@@ -20,39 +20,7 @@ button {
 
 /* Utility */
 .hidden {
-  display: none !important;
-}
-
-/* Splash screen */
-#splash-screen {
-  height: 100vh;
-  overflow: hidden;
-  background-image: url("wallpaper.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#user-select {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1.5em;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-#admin-link {
-  margin-top: 1em;
-  font-size: 0.8em;
-  text-align: right;
-}
-
-#admin-link a {
-  text-decoration: none;
-  color: #555;
+  display: none;
 }
 
 /* PIN Entry */
@@ -61,36 +29,6 @@ button {
   padding: 0.4em;
   width: 180px;
   text-align: center;
-}
-
-.pin-dots {
-  font-size: 2em;
-  letter-spacing: 0.5em;
-  margin: 1em auto;
-  width: 8em;
-  text-align: center;
-}
-
-.pin-keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 60px);
-  gap: 0.5em;
-  justify-content: center;
-  margin-bottom: 1em;
-}
-
-.pin-key {
-  font-size: 1.5em;
-  padding: 0.5em;
-  background: #eee;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  user-select: none;
-}
-
-.pin-key:active {
-  background: #ddd;
 }
 
 /* Chore Button Grid */
@@ -146,17 +84,15 @@ button {
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Status Messages */
+/* Optional: Status Messages */
 #log-status {
   margin-top: 1em;
   color: green;
 }
-
 #pin-status {
   color: red;
 }
 
-/* Pastel Button Color Variants */
 .pastel-blue {
   background-color: #e0f0ff;
   border-color: #a0c4ff;
@@ -185,4 +121,34 @@ button {
 .pastel-pink {
   background-color: #ffe0f0;
   border-color: #f8a4d8;
+}
+
+.pin-dots {
+  font-size: 2em;
+  letter-spacing: 0.5em;
+  margin: 1em auto;
+  width: 8em;
+  text-align: center;
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 0.5em;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+.pin-key {
+  font-size: 1.5em;
+  padding: 0.5em;
+  background: #eee;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  user-select: none;
+}
+
+.pin-key:active {
+  background: #ddd;
 }
