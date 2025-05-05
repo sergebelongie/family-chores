@@ -240,6 +240,7 @@ button {
   padding: 2em;
   border-radius: 16px;
   text-align: center;
+  max-width: 320px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.25);
 }
 
@@ -248,8 +249,16 @@ button {
 }
 
 #welcome-ok-button {
-  font-size: 1em;
   margin-top: 1em;
-  padding: 0.5em 1.5em;
-  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1.1em;
+  border-radius: 10px;
+  border: none;
+  background: #a0c4ff;
+  color: white;
+  cursor: pointer;
+}
+
+#welcome-ok-button:hover {
+  background: #88b2f2;
 }

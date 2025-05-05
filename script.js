@@ -186,18 +186,30 @@ async function submitPIN() {
 
   if (selectedUser === "admin") {
     showAdminDashboard();
-  } else {
-    document.getElementById("pin-entry").classList.add("hidden");
-    document.getElementById("chore-logger").classList.remove("hidden");
-    document.getElementById("user-title").textContent = `${userData.displayName}’s Chores`;
-    // Show welcome modal first
-    document.getElementById("welcome-name").textContent = userData.displayName;
-    document.getElementById("welcome-modal").classList.remove("hidden");
+    return;
+  }
 
-    document.getElementById("welcome-ok-button").onclick = () => {
-    document.getElementById("welcome-modal").classList.add("hidden");
+  // Hide PIN screen and show chore logger
+  document.getElementById("pin-entry").classList.add("hidden");
+  document.getElementById("chore-logger").classList.remove("hidden");
+  document.getElementById("user-title").textContent = `${userData.displayName}’s Chores`;
+
+  // Show welcome modal with dismissal before enabling buttons
+  const welcomeNameEl = document.getElementById("welcome-name");
+  const welcomeModalEl = document.getElementById("welcome-modal");
+  const welcomeOkBtn = document.getElementById("welcome-ok-button");
+
+  if (userData.displayName && welcomeModalEl && welcomeNameEl && welcomeOkBtn) {
+    welcomeNameEl.textContent = userData.displayName;
+    welcomeModalEl.classList.remove("hidden");
+
+    welcomeOkBtn.onclick = () => {
+      welcomeModalEl.classList.add("hidden");
+      renderChoreButtons(); // only render buttons after confirmation
+    };
+  } else {
+    // fallback in case modal is missing
     renderChoreButtons();
-};
   }
 }
 
