@@ -190,7 +190,14 @@ async function submitPIN() {
     document.getElementById("pin-entry").classList.add("hidden");
     document.getElementById("chore-logger").classList.remove("hidden");
     document.getElementById("user-title").textContent = `${userData.displayName}’s Chores`;
+    // Show welcome modal first
+    document.getElementById("welcome-name").textContent = userData.displayName;
+    document.getElementById("welcome-modal").classList.remove("hidden");
+
+    document.getElementById("welcome-ok-button").onclick = () => {
+    document.getElementById("welcome-modal").classList.add("hidden");
     renderChoreButtons();
+};
   }
 }
 
