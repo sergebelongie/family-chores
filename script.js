@@ -37,6 +37,8 @@ function getWeekNumber(date) {
 // Log predefined chore
 async function logChore(choreName) {
   const note = prompt(`Optional note for: ${choreName}`, "");
+  if (note === null) return;  // ✅ User hit Cancel, do nothing
+
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
 
@@ -44,7 +46,7 @@ async function logChore(choreName) {
     user: selectedUser,
     chore: choreName,
     timestamp: Timestamp.now(),
-    note: note || "",
+    note: note.trim(),
     week
   });
 
@@ -53,19 +55,19 @@ async function logChore(choreName) {
 
 // Log a custom "Other" chore with required note
 async function logOtherChore() {
-  let note = "";
-  while (!note) {
-    note = prompt("Describe the chore you completed:");
-    if (note === null) return; // User canceled
-    note = note.trim();
-  }
+  const choreName = "🌀 Other";
+  let note = prompt("Describe the chore you completed:");
+  if (note === null) return; // 🛑 User hit cancel
+
+  note = note.trim();
+  if (!note) return; // 🛑 Empty note — don't log
 
   const now = new Date();
   const week = `${now.getFullYear()}-W${getWeekNumber(now)}`;
 
   await addDoc(collection(db, "logs"), {
     user: selectedUser,
-    chore: "Other",
+    chore: choreName,
     timestamp: Timestamp.now(),
     note,
     week
