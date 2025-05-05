@@ -105,28 +105,42 @@ async function showChoreHistory() {
   const historyList = document.getElementById("history-list");
   historyList.innerHTML = "";
 
-  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  // Calculate Monday 00:00 of the current week
+  function getStartOfWeek(date = new Date()) {
+    const day = date.getDay(); // Sunday = 0, Monday = 1
+    const diff = day === 0 ? -6 : 1 - day; // Shift Sunday to previous Monday
+    const start = new Date(date);
+    start.setDate(date.getDate() + diff);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }
+
+  const startOfWeek = getStartOfWeek();
 
   const q = query(
     collection(db, "logs"),
     where("user", "==", selectedUser),
-    where("timestamp", ">", Timestamp.fromDate(oneWeekAgo)),
+    where("timestamp", ">", Timestamp.fromDate(startOfWeek)),
     orderBy("timestamp", "desc")
   );
 
   const snapshot = await getDocs(q);
 
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const dateObj = data.timestamp.toDate();
-    const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-    const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
+  if (snapshot.empty) {
+    historyList.innerHTML = "<li>No chores logged this week.</li>";
+  } else {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const dateObj = data.timestamp.toDate();
+      const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      const noteStr = data.note ? `<br><em>Note:</em> ${data.note}` : "";
 
-    const item = document.createElement("li");
-    item.innerHTML = `<strong>${data.chore}</strong><br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
-    historyList.appendChild(item);
-  });
+      const item = document.createElement("li");
+      item.innerHTML = `<strong>${data.chore}</strong><br><small>${dateStr}, ${timeStr}</small>${noteStr}`;
+      historyList.appendChild(item);
+    });
+  }
 
   historySection.classList.remove("hidden");
 }
