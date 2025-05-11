@@ -4,7 +4,7 @@ export const categorizedChores = [
       colorClass: "pastel-blue",
       chores: [
         "🪥 Brush teeth before school",
-        "👕 Choose school outfit",
+        "🍽️ Come to breakfast table at 7am",
         "🌞 Put on sunblock",
         "🛏️ Make bed"
       ]
@@ -48,11 +48,13 @@ export const categorizedChores = [
       ]
     },
     {
-      category: "🎨 Personal Projects",
+      category: "🎨 Evening Routine",
       colorClass: "pastel-pink",
       chores: [
         "📚 Independent reading",
-        "🧩 Put away toys/crafting materials"
+        "🧩 Put away toys/crafting materials",
+        "👕 Choose school outfit for tomorrow",
+        "😴 Head on pillow at 9:30pm"
       ]
     }
   ];
